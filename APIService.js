@@ -16,6 +16,12 @@ MongoClient.connect("mongodb+srv://quantum:Quantumdata123@cluster0-jjukt.mongodb
   console.log("Listening on port 3000");
 });
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.post("/:deviceid", function(req, res) {
   db.collection(req.params.deviceid).insertOne(req.body).then (function() {
     res.send("OK!");
@@ -26,6 +32,14 @@ app.post("/:deviceid", function(req, res) {
 app.get("/:deviceid", function(req, res) {
   var group = [];
   db.collection(req.params.deviceid).find({}).toArray(function(err, docs){
+    res.send(docs);
+    res.end();
+  });
+});
+
+app.get("/:deviceid/last/:amount", function(req, res) {
+  var limitAmount = parseInt(req.params.amount);
+  db.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(limitAmount).toArray(function(err, docs){
     res.send(docs);
     res.end();
   });
